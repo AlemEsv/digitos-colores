@@ -180,10 +180,18 @@ def commit_to_github():
         max_images_per_commit = 50
         uploaded_files = []  # Para rastrear archivos subidos
         
+        # Debug: verificar qué carpetas y archivos existen
+        debug_info = []
+        
         for digit in range(10):
             digit_folder = os.path.join(os.getcwd(), str(digit))
+            debug_info.append(f"Carpeta {digit}: existe={os.path.exists(digit_folder)}")
+            
             if os.path.exists(digit_folder):
-                for img_file in glob.glob(os.path.join(digit_folder, '*.png')):
+                png_files = glob.glob(os.path.join(digit_folder, '*.png'))
+                debug_info.append(f"  - Archivos .png encontrados: {len(png_files)}")
+                
+                for img_file in png_files:
                     if image_count >= max_images_per_commit:
                         break
                     
@@ -214,7 +222,8 @@ def commit_to_github():
                 break
         
         if image_count == 0:
-            return "No hay imágenes nuevas para subir.<br><a href='/'>Volver</a>"
+            debug_msg = "<br>".join(debug_info)
+            return f"No hay imágenes nuevas para subir.<br><br>Debug info:<br>{debug_msg}<br><br><a href='/'>Volver</a>"
         
         # Crear tree
         tree_url = f'https://api.github.com/repos/{repo_owner}/{repo_name}/git/trees'
